@@ -1,0 +1,147 @@
+name: build_SGSI-11
+
+on: 
+  watch: 
+    types: [started]
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps: 
+       - name: Checkout
+         uses: actions/checkout@main
+       
+       - name: Clean Up
+         run: |       
+           docker rmi `docker images -q`
+           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+           sudo -E apt-get update
+           sudo -E apt-get -y autoremove --purge
+           sudo -E apt-get clean
+           
+       - name: Get variables
+         run: |
+           echo -e "\033[33m 线程数: $(nproc) \033[0m"
+           echo "::set-output name=rom_url::$(jq -r '.rom_url' sgsi.json)"
+           echo "::set-output name=rom_name::$(jq -r '.rom_name' sgsi.json)"
+           echo "::set-output name=pack_sgsi::$(jq -r '.pack_sgsi' sgsi.json)"
+           echo "::set-output name=make_type::$(jq -r '.make_type' sgsi.json)"
+           echo "::set-output name=rom_type::$(jq -r '.rom_type' sgsi.json)"
+           echo "::set-output name=light_fix::$(jq -r '.light_fix' sgsi.json)"
+           echo "::set-output name=bug_fix::$(jq -r '.bug_fix' sgsi.json)"
+           echo "::set-output name=version::$(jq -r '.version' sgsi.json)"
+           echo "::set-output name=upload_transfer::$(jq -r '.upload_transfer' sgsi.json)"
+           echo "::set-output name=upload_release::$(jq -r '.upload_release' sgsi.json)"
+           echo "::set-output name=use_7zip::$(jq -r '.use_7zip' sgsi.json)"
+           echo "::set-output name=use_zip::$(jq -r '.use_zip' sgsi.json)"           
+           
+         id: var
+         
+       - name: Setting Up
+         run: |
+            #sudo apt update && sudo apt upgrade -y
+            sudo apt-get install -y git wget git zip unzip curl axel
+            df -h
+           
+       - name: Download SGSI-build-tool
+         uses: robinraju/release-downloader@v1
+         with: 
+           repository: "xiaoxindada/SGSI-build-tool"
+           tag: "v11-1.7"
+           fileName: "SGSI-build-tool-11.tar"
+           
+       - name: Initialization environment
+         run: |
+           sudo tar -xf SGSI-build-tool-11.tar
+           sudo rm -rf SGSI-build-tool-11/setup.sh
+           sudo mv bin/setup.sh SGSI-build-tool-11/
+           sudo rm -rf SGSI-build-tool-11/11/make.sh
+           sudo mv bin/make.sh SGSI-build-tool-11/11/
+           sudo rm -rf SGSI-build-tool-11/11/SGSI.sh
+           sudo mv bin/SGSI.sh SGSI-build-tool-11/11/
+           sudo rm -rf SGSI-build-tool-11/11/fixbug/fixbug.sh
+           sudo mv bin/fixbug.sh SGSI-build-tool-11/11/fixbug/
+           sudo rm -rf SGSI-build-tool-11/11/makeimg.sh
+           sudo mv bin/makeimg.sh SGSI-build-tool-11/11/
+           sudo chmod 777 -R SGSI-build-tool-11/
+           sudo apt-get -y purge "openjdk*"
+           sudo bash SGSI-build-tool-11/11/setup.sh
+           #dpkg -l | grep "openjdk*"
+           sudo apt-get -y --purge remove "adoptopenjdk-11-hotspot"
+           java -version
+           
+       - name: Download Rom
+         run: |
+           axel -n $(nproc) -U "Mozilla/5.0" ${{ steps.var.outputs.rom_url }} -o SGSI-build-tool-11/11/tmp/${{ steps.var.outputs.rom_name }} || wget -U "Mozilla/5.0" ${{ steps.var.outputs.rom_url }} -O SGSI-build-tool-11/11/tmp/${{ steps.var.outputs.rom_name }}
+             
+       - name: Building AB SGSI
+         if: steps.var.outputs.make_type == 'AB' || steps.var.outputs.make_type == 'ab'
+         run: |
+            cd SGSI-build-tool-11/11
+            sudo bash make.sh AB
+            
+       - name: Building A-only SGSI
+         if: steps.var.outputs.make_type == 'A' || steps.var.outputs.make_type == 'a'
+         run: |
+            cd SGSI-build-tool-11/11
+            sudo bash make.sh A
+            
+       - name: Fixing Light Start
+         if: steps.var.outputs.light_fix == 'true'
+         run: |
+            echo "启用亮度修复"
+            cd SGSI-build-tool-11/11
+            sudo cp -frp out/system/system/framework/services.jar fixbug/light_fix/
+            cd fixbug/light_fix
+            sudo bash brightness_fix.sh
+            
+       - name: Fixing Light Finish
+         if: steps.var.outputs.light_fix == 'true'
+         run: |
+            cd SGSI-build-tool-11/11
+            sudo cp -frp fixbug/light_fix/services.jar.out/dist/services.jar out/system/system/framework/services.jar
+            echo "替换完成"
+            
+       - name: Fixing Bug
+         if: steps.var.outputs.bug_fix == 'true'
+         run: |
+            echo "启用bug修复"
+            cd SGSI-build-tool-11/11/fixbug
+            sudo bash fixbug.sh ${{ steps.var.outputs.rom_type }}
+            
+       - name: Packing SGSI Image
+         run: |
+            echo "SGSI化处理完成"
+            cd SGSI-build-tool-11/11
+            sudo bash makeimg.sh ${{ steps.var.outputs.make_type }}
+            exit
+            
+       - name: Packing Output File to 7zip
+         if: steps.var.outputs.use_7zip == 'true'
+         run: |   
+             cd SGSI-build-tool-11/11
+             7za a -t7z -r ${{ steps.var.outputs.pack_sgsi }} ./SGSI/*
+       
+       - name: Packing Output File to zip
+         if: steps.var.outputs.use_zip == 'true'
+         run: |
+             cd SGSI-build-tool-11/11
+             zip -r ${{ steps.var.outputs.pack_sgsi }} ./SGSI/*
+             
+       - name: Uploading SGSI to WeTransfer
+         if: steps.var.outputs.upload_transfer == 'true' 
+         run: |
+           curl -sL https://git.io/file-transfer | sh
+           ./transfer wet ./SGSI-build-tool-11/11/${{ steps.var.outputs.pack_sgsi }}
+           
+       - name: Uploading SGSI to Release
+         if: steps.var.outputs.upload_release == 'true'
+         uses: softprops/action-gh-release@v1
+         with:
+           files: SGSI-build-tool-11/11/${{ steps.var.outputs.pack_sgsi }}
+           name: xiaoxinSGSI-${{ steps.var.outputs.rom_type }}-${{ steps.var.outputs.make_type }}-Android${{ steps.var.outputs.version }}-unpack
+           tag_name: main
+         env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
