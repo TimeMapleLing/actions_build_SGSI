@@ -33,7 +33,7 @@ jobs:
            echo "::set-output name=bug_fix:true
            echo "::set-output name=version:11
            echo "::set-output name=upload_transfer:true
-           echo "::set-output name=upload_release:false
+           echo "::set-output name=upload_release:true
            echo "::set-output name=use_7zip:false
            echo "::set-output name=use_zip:true
            
