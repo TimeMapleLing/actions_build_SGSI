@@ -1,14 +1,14 @@
 {
-  "rom_url": "http://download.h2os.com/OnePlus8Pro/MP/OnePlus8ProHydrogen_15.H.35_OTA_0350_all_2103232117_5a455e79c52e47d2.zip",
+  "rom_url": "https://hugeota.d.miui.com/21.1.14/miui_RAPHAEL_21.1.14_979131bba9_11.0.zip",
   "rom_name": "update.zip",
   "pack_sgsi": "SGSI.zip",
   "make_type": "AB",
-  "rom_type": "h2os",
+  "rom_type": "miui",
   "light_fix": true,
   "bug_fix": true,
   "version": "11",
   "upload_transfer": true,
   "upload_release": false,
-  "use_7zip": false,
-  "use_zip": true
+  "use_7zip": true,
+  "use_zip": false
 }
