@@ -24,18 +24,18 @@ jobs:
        - name: Get variables
          run: |
            echo -e "\033[33m 线程数: $(nproc) \033[0m"
-           echo "::set-output name=rom_url::$(jq -r '.rom_url' sgsi.json)"
-           echo "::set-output name=rom_name::$(jq -r '.rom_name' sgsi.json)"
-           echo "::set-output name=pack_sgsi::$(jq -r '.pack_sgsi' sgsi.json)"
-           echo "::set-output name=make_type::$(jq -r '.make_type' sgsi.json)"
-           echo "::set-output name=rom_type::$(jq -r '.rom_type' sgsi.json)"
-           echo "::set-output name=light_fix::$(jq -r '.light_fix' sgsi.json)"
-           echo "::set-output name=bug_fix::$(jq -r '.bug_fix' sgsi.json)"
-           echo "::set-output name=version::$(jq -r '.version' sgsi.json)"
-           echo "::set-output name=upload_transfer::$(jq -r '.upload_transfer' sgsi.json)"
-           echo "::set-output name=upload_release::$(jq -r '.upload_release' sgsi.json)"
-           echo "::set-output name=use_7zip::$(jq -r '.use_7zip' sgsi.json)"
-           echo "::set-output name=use_zip::$(jq -r '.use_zip' sgsi.json)"           
+           回声“ :: set-output name = rom_url :: https：//hugeota.d.miui.com/21.4.23/miui_STAR_21.4.23_32ae969a59_11.0.zip
+           回声“ :: set-output name = rom_name：updata.zip
+           回声“ :: set-output name = pack_sgsi :MIUI12_21_4_23_MI_11_U_R11.zip
+           echo "::set-output name=make_type:AB
+           echo "::set-output name=rom_type:
+           echo "::set-output name=light_fix:true
+           echo "::set-output name=bug_fix:true
+           echo "::set-output name=version:11
+           echo "::set-output name=upload_transfer:true
+           echo "::set-output name=upload_release:true
+           echo "::set-output name=use_7zip:false
+           echo "::set-output name=use_zip:true
            
          id: var
          
