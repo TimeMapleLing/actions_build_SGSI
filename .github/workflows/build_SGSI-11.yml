@@ -74,7 +74,7 @@ jobs:
            
        - name: Download Rom
          run: |
-           axel -n $(nproc) -U "Mozilla/5.0" ${{ steps.var.outputs.rom_url }} -o SGSI-build-tool-11/11/tmp/${{ steps.var.outputs.rom_name }} || wget -U "Mozilla/5.0" ${{ steps.var.outputs.rom_url }} -O SGSI-build-tool-11/11/tmp/${{ steps.var.outputs.rom_name }}
+           sudo wget -c ${{ steps.var.outputs.rom_url }} -O SGSI-build-tool-11/11/tmp/${{ steps.var.outputs.rom_name }}
              
        - name: Building AB SGSI
          if: steps.var.outputs.make_type == 'AB' || steps.var.outputs.make_type == 'ab'
