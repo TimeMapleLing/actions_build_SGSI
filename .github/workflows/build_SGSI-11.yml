@@ -51,7 +51,6 @@ jobs:
            
        - name: Initialization environment
          run: |
-           sudo tar -xf SGSI-build-tool-11.tar
            sudo rm -rf SGSI-build-tool-11/setup.sh
            sudo mv bin/setup.sh SGSI-build-tool-11/
            sudo rm -rf SGSI-build-tool-11/make.sh
