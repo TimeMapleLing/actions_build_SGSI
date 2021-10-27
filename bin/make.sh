@@ -24,7 +24,6 @@ case $1 in
 esac
 
 echo "环境初始化中 请稍候..."
-mkdir -p ./tmp
 chmod -R 777 ./
 chown -R root:root ./
 rm -rf ./*.img
@@ -55,7 +54,7 @@ if [ -e './payload.bin' ];then
   mv ./payload.bin ../payload
   echo "解压payload.bin中..."
   cd ../payload
-  python2 ./payload.py ./payload.bin ./out
+  python ./payload.py ./payload.bin ./out
   mv ./payload.bin ../tmp
   echo "移动img至输出目录..."
   if [ -e "./out/product.img" ];then
@@ -74,13 +73,6 @@ if [ -e './payload.bin' ];then
     mv ./out/odm.img ../tmp/
   fi  
  
-  if [ -e "./out/boot.img" ];then
-    mv ./out/boot.img ../tmp/
-  fi  
-  
-  if [ -e "./out/vendor_boot.img" ];then
-    mv ./out/vendor_boot.img ../tmp/
-  fi  
   mv ./out/system.img ../tmp/
   mv ./out/vendor.img ../tmp/
   rm -rf ./out/*
@@ -99,18 +91,10 @@ if [ -e './payload.bin' ];then
   if [ -e "./reserve.img" ];then
     mv ./reserve.img ../
   fi
-  
+
   if [ -e "./odm.img" ];then
     mv ./odm.img ../
-  fi    
-
-  if [ -e "./boot.img" ];then
-    mv ./boot.img ../
   fi
-  
-  if [ -e "./vendor_boot.img" ];then
-    mv ./vendor_boot.img ../
-  fi  
   echo "转换完成"
 fi
 
@@ -241,11 +225,9 @@ if [ -e ./system.img ];then
   case $make_type in
     "A"|"a") 
       ./SGSI.sh "A"
-      ./workspace_cleanup.sh
       ;;
     "AB"|"ab")  
-      ./SGSI.sh "AB"
-      ./workspace_cleanup.sh   
+      ./SGSI.sh "AB"  
       ;;
     *)
       echo "error!"
