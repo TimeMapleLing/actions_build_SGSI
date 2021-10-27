@@ -47,7 +47,7 @@ jobs:
            
        - name: Download SGSI-build-tool
          run |
-           git clone https://github.com/xiaoxindada/SGSI-build-tool.git -b 11 SGSI-build-tool-11
+           git clone https://github.com/xiaoxindada/SGSI-build-tool.git -b 11 SGSI-build-tool-11/
            
        - name: Initialization environment
          run: |
