@@ -65,6 +65,7 @@ jobs:
            sudo mv bin/fixbug.sh SGSI-build-tool-11/11/fixbug/
            sudo rm -rf SGSI-build-tool-11/11/makeimg.sh
            sudo mv bin/makeimg.sh SGSI-build-tool-11/11/
+           sudo chmod 777 -R SGSI-build-tool-11/
            sudo apt-get -y purge "openjdk*"
            sudo bash SGSI-build-tool-11/11/setup.sh
            #dpkg -l | grep "openjdk*"
